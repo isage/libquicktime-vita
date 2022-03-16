@@ -1,0 +1,101 @@
+libquicktime - A library for reading and writing quicktime/avi/mp4 files.
+http://libquicktime.sourceforge.net
+
+Copyright (C) 2002 Heroine Virtual Ltd.
+Copyright (C) 2002-2007 Members of the libquicktime project.
+
+Original quicktime4linux developer:
+
+  Heroine Virtual (Motion picture solutions for Linux)
+  <broadcast@earthling.net>
+  http://heroinewarrior.com/quicktime
+
+libquicktime developers:
+
+  Arthur Peters <amp@singingwizard.org>
+  Burkhard Plaum <plaum@ipf.uni-stuttgart.de>
+  Gerd Knorr <kraxel@bytesex.org>
+  Justin Schoeman 1998 <justin@suntiger.ee.up.ac.za>
+  Elliot Lee <sopwith@redhat.com>
+  and others
+
+RTjpeg:
+
+  Copyright (C) Justin Schoeman 1998 <justin@suntiger.ee.up.ac.za>
+
+  With modifications by:
+
+  Copyright (C) 1998, 1999 by Joerg Walter <trouble@moes.pmnet.uni-oldenburg.de>
+  Copyright (C) 1999 by Wim Taymans <wim.taymans@tvd.be>
+
+Portions from FFmpeg (plugins/rtjpeg/mmx.h):
+
+  Copyright (C) 1997-2001 H. Dietz and R. Fisher
+
+Portions from libsndfile (plugins/audiocodec/alaw_tables.h, ulaw_tables.h):
+
+  Copyright (C) 2002-2004 Erik de Castro Lopo
+
+------------------------------------------------------------------------
+
+Requires: 
+	libpthread
+	glibc >= 2.1
+
+This does not include libraries for the codecs. 
+If you want to have all availiable codec you will need:
+	libdv >= 0.9.5
+	libpng
+	the OggVorbis libraries
+	libjpeg
+
+
+
+------------------------------------------------------------------------
+
+libquicktime is a library for reading and writing quicktime files. It
+is based on the quicktime4linux library, with the following
+extensions:
+
+    * Sourcetree upgraded with autoconf/automake/libtool and all the 
+other stuff, people like in "standard" linux libraries.
+    * All 3rd party libraries (jpeg, OggVorbis) were removed to reduce 
+download size, compilation time and code duplication on users harddisks. 
+Instead, the sytemwide installed libaries are autodetected by the 
+configure script.
+    * All codecs have been moved into dynamically loadable modules. 
+This makes it possible to distribute closed source codecs (or codecs 
+with an incompatible license) as separate packages.
+    * Unlike other quicktime libraries, we are source compatible with 
+quicktime4linux. Programs like cinelerra or xmovie can be compiled with 
+libquicktime (if the build system is modified, see our web page for more 
+info).
+    * The codecs themselves are also source compatible with 
+quicktime4linux, so porting codecs between quicktime4linux and 
+libquicktime requires only little brain load.
+    * Special API extensions allow access to the codec registry. 
+Applications can get important information about the codecs, their 
+settable parameters etc. at runtime.
+
+For build and installation instructions see INSTALL.
+
+If you would like to get involved in development or have questions the 
+email list for you is libquicktime-devel@sourceforge.net.
+
+/*******************************************************
+ * References:
+ *********************************/
+
+Apple's quicktime file format information:
+
+http://developer.apple.com/techpubs/quicktime/qtdevdocs/REF/refQTFileFormat.htm
+
+Color space conversions:
+
+http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html
+
+
+
+
+
+

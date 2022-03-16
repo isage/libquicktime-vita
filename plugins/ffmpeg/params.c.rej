@@ -1,0 +1,37 @@
+--- plugins/ffmpeg/params.c	2018-04-27 10:26:36.463345111 +0200
++++ plugins/ffmpeg/params.c	2018-04-27 10:50:08.730705604 +0200
+@@ -279,9 +255,9 @@
+   PARAM_DICT_FLAG("ff_flag_qp_rd","qp_rd");
+   PARAM_DICT_FLAG("ff_flag2_strict_gop","strict_gop");
+ #else
+-  PARAM_FLAG("ff_flag_cbp_rd",CODEC_FLAG_CBP_RD);
+-  PARAM_FLAG("ff_flag_qp_rd",CODEC_FLAG_QP_RD);
+-  PARAM_FLAG2("ff_flag2_strict_gop",CODEC_FLAG2_STRICT_GOP);
++  PARAM_FLAG("ff_flag_cbp_rd",AV_CODEC_FLAG_CBP_RD);
++  PARAM_FLAG("ff_flag_qp_rd",AV_CODEC_FLAG_QP_RD);
++  PARAM_FLAG2("ff_flag2_strict_gop",AV_CODEC_FLAG2_STRICT_GOP);
+ #endif
+ 
+ #if LIBAVCODEC_VERSION_MAJOR >= 54
+@@ -289,14 +265,14 @@
+   PARAM_DICT_FLAG("ff_flag_obmc","obmc");
+   PARAM_DICT_FLAG("ff_flag_h263p_slice_struct","structured_slices");
+ #else
+-  PARAM_FLAG("ff_flag_h263p_aiv",CODEC_FLAG_H263P_AIV);
+-  PARAM_FLAG("ff_flag_obmc",CODEC_FLAG_OBMC);
+-  PARAM_FLAG("ff_flag_h263p_slice_struct",CODEC_FLAG_H263P_SLICE_STRUCT);
++  PARAM_FLAG("ff_flag_h263p_aiv",AV_CODEC_FLAG_H263P_AIV);
++  PARAM_FLAG("ff_flag_obmc",AV_CODEC_FLAG_OBMC);
++  PARAM_FLAG("ff_flag_h263p_slice_struct",AV_CODEC_FLAG_H263P_SLICE_STRUCT);
+ #endif
+ 
+-  PARAM_FLAG("ff_flag_loop_filter",CODEC_FLAG_LOOP_FILTER);
+-  PARAM_FLAG("ff_flag_closed_gop",CODEC_FLAG_CLOSED_GOP);
+-  PARAM_FLAG2("ff_flag2_fast",CODEC_FLAG2_FAST);
+-  PARAM_ENUM("ff_coder_type",coder_type,coder_type);
++  PARAM_FLAG("ff_flag_loop_filter",AV_CODEC_FLAG_LOOP_FILTER);
++  PARAM_FLAG("ff_flag_closed_gop",AV_CODEC_FLAG_CLOSED_GOP);
++  PARAM_FLAG2("ff_flag2_fast",AV_CODEC_FLAG2_FAST);
++  PARAM_DICT_INT("ff_coder_type","coder");
+   
+   }
