@@ -315,8 +315,8 @@ struct CODECIDMAP
   {
   int id;
   int index;
-  AVCodec *encoder;
-  AVCodec *decoder;
+  AVCodec const *encoder;
+  AVCodec const *decoder;
   lqt_parameter_info_static_t * encode_parameters;
   lqt_parameter_info_static_t * decode_parameters;
   lqt_image_size_static_t     * image_sizes;
@@ -948,7 +948,9 @@ static void ffmpeg_map_init(void)
     }
     
 //  avcodec_init();
+#if LIBAVCODEC_VERSION_MAJOR < 59
   avcodec_register_all();
+#endif
 
   ffmpeg_num_video_codecs = 0;
   ffmpeg_num_audio_codecs = 0;

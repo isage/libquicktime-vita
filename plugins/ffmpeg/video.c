@@ -61,8 +61,8 @@ enum AvidYuvRange
 typedef struct
   {
   AVCodecContext * avctx;
-  AVCodec * encoder;
-  AVCodec * decoder;
+  AVCodec const * encoder;
+  AVCodec const * decoder;
   int initialized;
 
   int decoding_delay;
@@ -878,10 +878,12 @@ static int lqt_ffmpeg_decode_video(quicktime_t *file, unsigned char **row_pointe
         }
 #endif
       
-      if(avcodec_decode_video2(codec->avctx,
-                               codec->frame,
-                               &got_pic,
-                               &codec->pkt) < 0)
+      if(avcodec_send_packet(codec->avctx, &codec->pkt) == 0 &&
+         avcodec_receive_frame(codec->avctx, codec->frame) == 0)
+        {
+        got_pic = 1;
+        }
+      else
         {
         lqt_log(file, LQT_LOG_ERROR, LOG_DOMAIN, "Skipping corrupted frame");
         continue;
@@ -1062,10 +1064,8 @@ static void resync_ffmpeg(quicktime_t *file, int track)
 #if LIBAVCODEC_BUILD >= ((52<<16)+(26<<8)+0)
         codec->pkt.data = codec->buffer;
         codec->pkt.size = buffer_size;
-        avcodec_decode_video2(codec->avctx,
-                              codec->frame,
-                              &got_pic,
-                              &codec->pkt);
+        got_pic = (avcodec_send_packet(codec->avctx, &codec->pkt) == 0 &&
+                   avcodec_receive_frame(codec->avctx, codec->frame) == 0);
 #else
         avcodec_decode_video(codec->avctx,
                              codec->frame,
@@ -1139,7 +1139,9 @@ static int init_imx_encoder(quicktime_t *file, int track)
   codec->avctx->intra_dc_precision = 2;
   codec->avctx->qmin = 1;
   codec->avctx->qmax = 3;
+#if (LIBAVCODEC_VERSION_MAJOR < 59)
   codec->avctx->rtp_payload_size = 1; // ??
+#endif
   av_dict_set(&codec->options, "rc_buf_aggressivity", "0.25", 0);
   codec->avctx->flags |= AV_CODEC_FLAG_INTERLACED_DCT|AV_CODEC_FLAG_LOW_DELAY;
 
@@ -1290,7 +1292,6 @@ static int lqt_ffmpeg_encode_video(quicktime_t *file, unsigned char **row_pointe
   int stats_len;
 #if ENCODE_VIDEO2
   AVPacket pkt;
-  int got_packet;
 #endif
   int64_t pts;
   int kf;
@@ -1530,16 +1531,12 @@ static int lqt_ffmpeg_encode_video(quicktime_t *file, unsigned char **row_pointe
 #if ENCODE_VIDEO2 // New
   av_init_packet(&pkt);
   pkt.data = codec->buffer;
-  pkt.size = codec->buffer_alloc;
+  pkt.size = bytes_encoded = codec->buffer_alloc;
 
-  if(avcodec_encode_video2(codec->avctx, &pkt, codec->frame, &got_packet) < 0)
+  if(avcodec_send_frame(codec->avctx, codec->frame) < 0 ||
+     avcodec_receive_packet(codec->avctx, &pkt) < 0)
     return -1;
 
-  if(got_packet)
-    bytes_encoded = pkt.size;
-  else
-    bytes_encoded = 0;
-  
   pts = pkt.pts;
   kf = !!(pkt.flags & AV_PKT_FLAG_KEY);
     
@@ -1621,7 +1618,6 @@ static int flush(quicktime_t *file, int track)
   
 #if ENCODE_VIDEO2
   AVPacket pkt;
-  int got_packet;
 #endif
   
   /* Do nothing if we didn't encode anything yet */
@@ -1631,18 +1627,13 @@ static int flush(quicktime_t *file, int track)
 #if ENCODE_VIDEO2
   av_init_packet(&pkt);
   pkt.data = codec->buffer;
-  pkt.size = codec->buffer_alloc;
+  pkt.size = bytes_encoded = codec->buffer_alloc;
   
-  if(avcodec_encode_video2(codec->avctx, &pkt, (AVFrame*)0, &got_packet) < 0)
+  if(avcodec_send_frame(codec->avctx, NULL) < 0 ||
+     avcodec_receive_packet(codec->avctx, &pkt) < 0)
     return -1;
 
-  if(got_packet)
-    bytes_encoded = pkt.size;
-  else
-    return 0;
-  
   pts = pkt.pts;
-
   kf = !!(pkt.flags & AV_PKT_FLAG_KEY);
   
 #else
@@ -1872,8 +1863,8 @@ static int init_compressed_dv(quicktime_t * file, int track)
 
 void quicktime_init_video_codec_ffmpeg(quicktime_codec_t * codec_base,
                                        quicktime_video_map_t *vtrack,
-                                       AVCodec *encoder,
-                                       AVCodec *decoder)
+                                       const AVCodec *encoder,
+                                       const AVCodec *decoder)
   {
   quicktime_ffmpeg_video_codec_t *codec;
   char *compressor;

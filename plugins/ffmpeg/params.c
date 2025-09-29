@@ -113,12 +113,14 @@ typedef struct
   }
 
 
+#if LIBAVCODEC_VERSION_MAJOR < 59
 enum_t prediction_method[] =
   {
     { "Left",   FF_PRED_LEFT },
     { "Plane",  FF_PRED_PLANE },
     { "Median", FF_PRED_MEDIAN }
   };
+#endif
 
 enum_t compare_func[] =
   {
@@ -183,7 +185,9 @@ void lqt_ffmpeg_set_parameter(AVCodecContext * ctx,
   PARAM_INT("ff_max_qdiff",max_qdiff);
   PARAM_INT("ff_max_b_frames",max_b_frames);
   PARAM_FLOAT("ff_b_quant_factor",b_quant_factor);
-//  PARAM_INT("ff_b_frame_strategy",b_frame_strategy);
+#if LIBAVCODEC_VERSION_MAJOR < 59
+  PARAM_INT("ff_b_frame_strategy",b_frame_strategy);
+#endif
 //  PARAM_INT("ff_luma_elim_threshold",luma_elim_threshold);
 //  PARAM_INT("ff_chroma_elim_threshold",chroma_elim_threshold);
   PARAM_INT("ff_strict_std_compliance",strict_std_compliance);
@@ -199,7 +203,9 @@ void lqt_ffmpeg_set_parameter(AVCodecContext * ctx,
   PARAM_FLOAT("ff_spatial_cplx_masking",spatial_cplx_masking);
   PARAM_FLOAT("ff_p_masking",p_masking);
   PARAM_FLOAT("ff_dark_masking",dark_masking);
-//  PARAM_ENUM("ff_prediction_method",prediction_method,prediction_method);
+#if LIBAVCODEC_VERSION_MAJOR < 59
+  PARAM_ENUM("ff_prediction_method",prediction_method,prediction_method);
+#endif
   PARAM_ENUM("ff_me_cmp",me_cmp,compare_func);
   PARAM_CMP_CHROMA("ff_me_cmp_chroma",me_cmp);
   PARAM_ENUM("ff_me_sub_cmp",me_sub_cmp,compare_func);
